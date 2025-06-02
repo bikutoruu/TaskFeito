@@ -1,6 +1,8 @@
 # TaskFeito
 
-![TaskFeito App Screenshot]([https://freeimage.host/i/FHjQOzB](https://iili.io/FHjQOzB.png)) TaskFeito is a simple and intuitive task management application designed to help you keep track of your daily to-do's. This project serves as a **beta version** primarily for study and development purposes, but it's fully functional in what it promises!
+![image](https://github.com/user-attachments/assets/4cea7ff7-5d5a-45e7-a9aa-0d9a7bbe08dd)
+
+TaskFeito is a simple and intuitive task management application designed to help you keep track of your daily to-do's. This project serves as a **beta version** primarily for study and development purposes, but it's fully functional in what it promises!
 
 ## Features
 

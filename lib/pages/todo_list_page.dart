@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/todo.dart';
+import '../reposidores/todo_repository.dart';
 import '../widgets/todo_list_item.dart';
 
 class TodoListPage extends StatefulWidget {
@@ -11,9 +12,20 @@ class TodoListPage extends StatefulWidget {
 
 class _TodoListPageState extends State<TodoListPage> {
   List<Todo> todos = [];
+  final TodoRepository todoRepository = TodoRepository();
 
   Todo? deletedTodo;
   int? deletedTodoPos;
+
+  @override
+  void initState() {
+    super.initState();
+    todoRepository.getTodoList().then((value) {
+      setState(() {
+        todos = value;
+      });
+    });
+  }
 
   void onDelete(Todo todo) {
     deletedTodo = todo;
@@ -22,6 +34,7 @@ class _TodoListPageState extends State<TodoListPage> {
     setState(() {
       todos.remove(todo);
     });
+    todoRepository.saveTodoList(todos);
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -37,6 +50,7 @@ class _TodoListPageState extends State<TodoListPage> {
             setState(() {
               todos.insert(deletedTodoPos!, deletedTodo!);
             });
+            todoRepository.saveTodoList(todos);
           },
         ),
         duration: Duration(seconds: 5),
@@ -56,6 +70,24 @@ class _TodoListPageState extends State<TodoListPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Row(
+                    children: [
+                      Flexible(
+                        child: Image.asset(
+                          'assets/icons/taskfeito_icon.png',
+
+                        ),
+                      ),
+                      Flexible(
+                        child: Image.asset(
+                            'assets/icons/taskfeito_branding.png'
+                        ),
+                      )
+
+                    ]
+
+                ),
+                SizedBox(height: 16),
                 // Widget para adicionar Tarefa
                 Row(
                   children: [
@@ -80,8 +112,19 @@ class _TodoListPageState extends State<TodoListPage> {
                               dateTime: DateTime.now(),
                             );
                             todos.add(newTodo);
+                            ScaffoldMessenger.of(context).clearSnackBars();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  duration: Duration(seconds: 3),
+                                  content: Text(
+                                    'Tarefa adicionada com sucesso!',
+                                  ),
+                                  backgroundColor: Colors.green,
+                                ),
+                            );
                           });
                           todoController.clear();
+                          todoRepository.saveTodoList(todos);
                         } else if (todoController.text.isEmpty) {
                           ScaffoldMessenger.of(context).clearSnackBars();
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -153,6 +196,19 @@ class _TodoListPageState extends State<TodoListPage> {
   }
 
   void showDeletConfirmation() {
+    if(todos.length == 0){
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: Duration(seconds: 5),
+          content: Text(
+            'Você não possui tarefas pendentes!',
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+    else if(todos.length > 0){
     showDialog(
       context: context,
       builder:
@@ -172,6 +228,7 @@ class _TodoListPageState extends State<TodoListPage> {
                   Navigator.of(context).pop();
                   setState(() {
                     deleteAllTodos();
+                    todoRepository.saveTodoList(todos);
                   });
                 },
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -180,6 +237,7 @@ class _TodoListPageState extends State<TodoListPage> {
             ],
           ),
     );
+    }
   }
 
   void deleteAllTodos() {
